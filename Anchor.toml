@@ -2,13 +2,15 @@
 seeds = false
 skip-lint = false
 [programs.localnet]
-mate = "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
+mate = "DqwzKubCtX7MkkyjPWJ1N2nuTEKoeruQkLTSoLGKMHm5"
+[programs.devnet]
+mate = "DqwzKubCtX7MkkyjPWJ1N2nuTEKoeruQkLTSoLGKMHm5"
 
 [registry]
-url = "https://api.apr.dev"
+url = "https://anchor.projectserum.com"
 
 [provider]
-cluster = "localnet"
+cluster = "devnet"
 wallet = "/Users/juan/.config/solana/id.json"
 
 [scripts]
