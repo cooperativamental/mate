@@ -14,6 +14,15 @@ pub mod mate {
         group.members = members;
         Ok(())
     }
+
+    pub fn create_project(ctx: Context<CreateProject>, name: String, ratio: u16, members: Vec<Pubkey>,) -> Result<()> {
+        let project = &mut ctx.accounts.project;
+        project.name = name;
+        project.ratio = ratio;
+        project.treasury = *ctx.accounts.treasury.key;
+        project.members = members;
+        Ok(())
+    }
 }
 
 #[derive(Accounts)]
@@ -31,8 +40,33 @@ pub struct CreateGroup<'info> {
     pub system_program: Program<'info, System>,
 }
 
+
+#[derive(Accounts)]
+pub struct CreateProject<'info> {
+    #[account(
+        init,
+        payer = initializer,
+        space = 9000
+    )]
+    pub project: Account<'info, Project>,
+    /// CHECK:
+    pub treasury: AccountInfo<'info>,
+    #[account(mut)]
+    pub initializer: Signer<'info>,
+    pub system_program: Program<'info, System>,
+}
+
+
 #[account]
 pub struct Group {
+    pub name: String,
+    pub treasury: Pubkey,
+    pub ratio: u16,
+    pub members: Vec<Pubkey>,
+}
+
+#[account]
+pub struct Project {
     pub name: String,
     pub treasury: Pubkey,
     pub ratio: u16,
