@@ -6,7 +6,7 @@ declare_id!("DqwzKubCtX7MkkyjPWJ1N2nuTEKoeruQkLTSoLGKMHm5");
 pub mod mate {
     use super::*;
 
-    pub fn initialize(ctx: Context<Initialize>, name: String, ratio: u16, members: Vec<Pubkey>,) -> Result<()> {
+    pub fn create_group(ctx: Context<CreateGroup>, name: String, ratio: u16, members: Vec<Pubkey>,) -> Result<()> {
         let group = &mut ctx.accounts.group;
         group.name = name;
         group.ratio = ratio;
@@ -17,7 +17,7 @@ pub mod mate {
 }
 
 #[derive(Accounts)]
-pub struct Initialize<'info> {
+pub struct CreateGroup<'info> {
     #[account(
         init,
         payer = initializer,
