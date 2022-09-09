@@ -9,15 +9,11 @@ describe("mate", () => {
   const program = anchor.workspace.Mate as Program<Mate>;
 
   it("Is initialized!", async () => {
-    const provider = anchor.getProvider();
-    anchor.setProvider(provider);
-  
-    const program = anchor.workspace.Mate as Program<Mate>;
     const group = anchor.web3.Keypair.generate();
     const treasury = anchor.web3.Keypair.generate();
     const initializer = (program.provider as anchor.AnchorProvider).wallet;
     
-    const tx = await program.methods.createGroup("Otro Grupo Mas",750,[])
+    const tx = await program.methods.createGroup("Mafia",10000,[])
     .accounts({
       group: group.publicKey,
       treasury: treasury.publicKey,
@@ -27,7 +23,5 @@ describe("mate", () => {
     .signers([group])
     .rpc();
     console.log("Your transaction signature", tx);
-    const groups = await program.account.group.all()
-    console.log(groups)
   });
 });
