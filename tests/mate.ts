@@ -17,7 +17,7 @@ describe("mate", () => {
     const treasury = anchor.web3.Keypair.generate();
     const initializer = (program.provider as anchor.AnchorProvider).wallet;
     
-    const tx = await program.methods.initialize("Grupo",1000,[])
+    const tx = await program.methods.initialize("Otro Grupo",1750,[])
     .accounts({
       group: group.publicKey,
       treasury: treasury.publicKey,
@@ -27,5 +27,7 @@ describe("mate", () => {
     .signers([group])
     .rpc();
     console.log("Your transaction signature", tx);
+    const groups = await program.account.group.all()
+    console.log(groups)
   });
 });
