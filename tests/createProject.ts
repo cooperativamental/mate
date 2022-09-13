@@ -12,8 +12,15 @@ describe("We Create a Project", () => {
     const project = anchor.web3.Keypair.generate();
     const treasury = anchor.web3.Keypair.generate();
     const initializer = (program.provider as anchor.AnchorProvider).wallet;
-    
-    const tx = await program.methods.createProject("Clean",123,[])
+    const payments = [] as unknown as Mate["types"][0]
+    const tx = await program.methods.createProject(
+      "Take care of that",
+      "Mafia",
+      "v0",
+      100,
+      payments,
+      ""
+      )
     .accounts({
       project: project.publicKey,
       treasury: treasury.publicKey,

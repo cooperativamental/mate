@@ -1,12 +1,17 @@
 use anchor_lang::prelude::*;
 
-declare_id!("DqwzKubCtX7MkkyjPWJ1N2nuTEKoeruQkLTSoLGKMHm5");
+declare_id!("8QnQs48q4Lak57jLNNdkyLXeKvxwXkigcGu6PBduRAJc");
 
 #[program]
 pub mod mate {
     use super::*;
 
-    pub fn create_group(ctx: Context<CreateGroup>, name: String, ratio: u16, members: Vec<Pubkey>,) -> Result<()> {
+    pub fn create_group(
+        ctx: Context<CreateGroup>,
+        name: String,
+        ratio: u16,
+        members: Vec<Pubkey>,
+    ) -> Result<()> {
         let group = &mut ctx.accounts.group;
         group.name = name;
         group.ratio = ratio;
@@ -15,12 +20,23 @@ pub mod mate {
         Ok(())
     }
 
-    pub fn create_project(ctx: Context<CreateProject>, name: String, ratio: u16, members: Vec<Pubkey>,) -> Result<()> {
+    pub fn create_project(
+        ctx: Context<CreateProject>,
+        name: String,
+        group: String,
+        project_type: String,
+        ratio: u16,
+        payments: Vec<Payment>,
+        next: String,
+    ) -> Result<()> {
         let project = &mut ctx.accounts.project;
         project.name = name;
+        project.group = group;
+        project.project_type = project_type;
         project.ratio = ratio;
         project.treasury = *ctx.accounts.treasury.key;
-        project.members = members;
+        project.payments = payments;
+        project.next = next;
         Ok(())
     }
 }
@@ -40,7 +56,6 @@ pub struct CreateGroup<'info> {
     pub system_program: Program<'info, System>,
 }
 
-
 #[derive(Accounts)]
 pub struct CreateProject<'info> {
     #[account(
@@ -56,7 +71,6 @@ pub struct CreateProject<'info> {
     pub system_program: Program<'info, System>,
 }
 
-
 #[account]
 pub struct Group {
     pub name: String,
@@ -68,7 +82,16 @@ pub struct Group {
 #[account]
 pub struct Project {
     pub name: String,
+    pub group: String,
+    pub project_type: String,
     pub treasury: Pubkey,
     pub ratio: u16,
-    pub members: Vec<Pubkey>,
+    pub payments: Vec<Payment>,
+    pub next: String,
+}
+
+#[derive(Debug, Clone, AnchorSerialize, AnchorDeserialize)]
+pub struct Payment {
+    member: Pubkey,
+    amount: u64,
 }
