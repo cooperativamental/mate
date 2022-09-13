@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-declare_id!("8QnQs48q4Lak57jLNNdkyLXeKvxwXkigcGu6PBduRAJc");
+declare_id!("8YRDRafzHrhbshhwRgWty4Skesz2Z6QTSL5Kv3CotLYq");
 
 #[program]
 pub mod mate {
@@ -94,4 +94,5 @@ pub struct Project {
 pub struct Payment {
     member: Pubkey,
     amount: u64,
+    currency: String,
 }
