@@ -13,10 +13,14 @@ pub mod mate {
         members: Vec<Pubkey>,
     ) -> Result<()> {
         let group = &mut ctx.accounts.group;
+
         group.name = name;
         group.ratio = ratio;
         group.treasury = *ctx.accounts.treasury.key;
         group.members = members;
+
+        msg!("Group {:#?} Created!", group.name);
+
         Ok(())
     }
 
@@ -30,6 +34,7 @@ pub mod mate {
         next: String,
     ) -> Result<()> {
         let project = &mut ctx.accounts.project;
+
         project.name = name;
         project.group = group;
         project.project_type = project_type;
@@ -37,6 +42,9 @@ pub mod mate {
         project.treasury = *ctx.accounts.treasury.key;
         project.payments = payments;
         project.next = next;
+
+        msg!("Project {:#?} Created for Group {:#?}!", project.name, project.group );
+
         Ok(())
     }
 }

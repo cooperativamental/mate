@@ -13,7 +13,7 @@ describe("We create a group", () => {
     const treasury = anchor.web3.Keypair.generate();
     const initializer = (program.provider as anchor.AnchorProvider).wallet;
     
-    const tx = await program.methods.createGroup("Diney",1000,[])
+    const tx = await program.methods.createGroup("Disney",1000,[])
     .accounts({
       group: group.publicKey,
       treasury: treasury.publicKey,
@@ -22,6 +22,6 @@ describe("We create a group", () => {
     })
     .signers([group])
     .rpc();
-    console.log("Your transaction signature", tx);
+    console.log(`https://explorer.solana.com/tx/${tx}?cluster=devnet`);
   });
 });

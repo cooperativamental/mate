@@ -8,16 +8,16 @@ describe("We Create a Project", () => {
 
   const program = anchor.workspace.Mate as Program<Mate>;
 
-  it("Is initialized!", async () => {
+  it("Creating project...", async () => {
     const project = anchor.web3.Keypair.generate();
     const treasury = anchor.web3.Keypair.generate();
     const initializer = (program.provider as anchor.AnchorProvider).wallet;
     const payments = [] as unknown as Mate["types"][0]
     const tx = await program.methods.createProject(
-      "Take care of that",
-      "Mafia",
+      "Clean apartment",
+      "CLeaners",
       "v0",
-      100,
+      1000,
       payments,
       ""
       )
@@ -29,6 +29,6 @@ describe("We Create a Project", () => {
     })
     .signers([project])
     .rpc();
-    console.log("Your transaction signature", tx);
+    console.log(`https://explorer.solana.com/tx/${tx}?cluster=devnet`);
   });
 });
