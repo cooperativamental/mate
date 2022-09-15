@@ -2,16 +2,16 @@
 seeds = false
 skip-lint = false
 [programs.localnet]
-mate = "8YRDRafzHrhbshhwRgWty4Skesz2Z6QTSL5Kv3CotLYq"
+mate = "6VdcN2k1Fm2S5EpGxvXHggDoCwRCqt9XT8u8jNxJaNmw"
 [programs.devnet]
-mate = "8YRDRafzHrhbshhwRgWty4Skesz2Z6QTSL5Kv3CotLYq"
+mate = "6VdcN2k1Fm2S5EpGxvXHggDoCwRCqt9XT8u8jNxJaNmw"
 
 [registry]
 url = "https://anchor.projectserum.com"
 
 [provider]
 cluster = "devnet"
-wallet = "/Users/juan/.config/solana/id.json"
+wallet = "dev_account.json"
 
 [scripts]
 test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
