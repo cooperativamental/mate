@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-declare_id!("8YRDRafzHrhbshhwRgWty4Skesz2Z6QTSL5Kv3CotLYq");
+declare_id!("6VdcN2k1Fm2S5EpGxvXHggDoCwRCqt9XT8u8jNxJaNmw");
 
 #[program]
 pub mod mate {
@@ -32,6 +32,11 @@ pub mod mate {
         ratio: u16,
         payments: Vec<Payment>,
         next: String,
+        currency: String,
+        amount: u64,
+        start_date: u64,
+        end_date: u64,
+        client: Pubkey,
     ) -> Result<()> {
         let project = &mut ctx.accounts.project;
 
@@ -42,6 +47,12 @@ pub mod mate {
         project.treasury = *ctx.accounts.treasury.key;
         project.payments = payments;
         project.next = next;
+        project.currency = currency;
+        project.status = "INITIALIZATED".to_string();
+        project.amount = amount;
+        project.start_date = start_date;
+        project.end_date = end_date;
+        project.client = client;
 
         msg!("Project {:#?} Created for Group {:#?}!", project.name, project.group );
 
@@ -95,6 +106,12 @@ pub struct Project {
     pub treasury: Pubkey,
     pub ratio: u16,
     pub payments: Vec<Payment>,
+    pub currency: String,
+    pub status: String,
+    pub amount: u64,
+    pub start_date: u64,
+    pub end_date: u64,
+    pub client: Pubkey,
     pub next: String,
 }
 
@@ -102,5 +119,4 @@ pub struct Project {
 pub struct Payment {
     member: Pubkey,
     amount: u64,
-    currency: String,
 }
