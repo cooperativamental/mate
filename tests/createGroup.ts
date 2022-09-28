@@ -9,7 +9,7 @@ describe("We create a group", () => {
 
   const program = anchor.workspace.Mate as Program<Mate>;
 
-  it("Creando grupo!", async () => {
+  it("Creando Grupo!", async () => {
     const group = anchor.web3.Keypair.generate();
     const treasury = anchor.web3.Keypair.generate();
     const initializer = (program.provider as anchor.AnchorProvider).wallet;
