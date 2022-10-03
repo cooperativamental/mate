@@ -1,6 +1,9 @@
-use anchor_lang::prelude::*;
+use anchor_lang::{
+    prelude::*,
+    solana_program::{program::invoke, system_instruction},
+};
 
-declare_id!("6VdcN2k1Fm2S5EpGxvXHggDoCwRCqt9XT8u8jNxJaNmw");
+declare_id!("5LF9R3vBrXDF3vKMyaWjk4BrNZonK1CgTXt89FmBbLA5");
 
 #[program]
 pub mod mate {
@@ -54,7 +57,53 @@ pub mod mate {
         project.end_date = end_date;
         project.client = client;
 
-        msg!("Project {:#?} Created for Group {:#?}!", project.name, project.group );
+        msg!(
+            "Project {:#?} Created for Group {:#?}!",
+            project.name,
+            project.group
+        );
+
+        Ok(())
+    }
+
+    pub fn pay_project(ctx: Context<PayProject>) -> Result<()> {
+        let project = &ctx.accounts.project;
+        let members = [
+            &mut ctx.accounts.member_0,
+            &mut ctx.accounts.member_1,
+            &mut ctx.accounts.member_2,
+            &mut ctx.accounts.member_3,
+            &mut ctx.accounts.member_4,
+            &mut ctx.accounts.member_5,
+            &mut ctx.accounts.member_6,
+            &mut ctx.accounts.member_7,
+            &mut ctx.accounts.member_8,
+            &mut ctx.accounts.member_9,
+        ];
+        ctx.accounts.project.payments.iter().for_each(|payment| {
+            msg!("algo");
+            let found = members
+                .iter()
+                .find(|account| account.key == &payment.member);
+            match found {
+                Some(member) => invoke(
+                    &system_instruction::transfer(
+                        ctx.accounts.payer.key,
+                        &payment.member,
+                        1,
+                    ),
+                    &[
+                        ctx.accounts.payer.to_account_info().clone(),
+                        member.to_account_info().clone(),
+                    ],
+                ),
+                None => Ok(()),
+            };
+        });
+        let project = &mut ctx.accounts.project;
+        project.status = "PAYED".to_string();
+
+        msg!("Project {:#?} Payed!", project.name);
 
         Ok(())
     }
@@ -88,6 +137,46 @@ pub struct CreateProject<'info> {
     #[account(mut)]
     pub initializer: Signer<'info>,
     pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
+pub struct PayProject<'info> {
+    #[account(mut)]
+    pub project: Account<'info, Project>,
+    /// CHECK:
+    #[account(mut)]
+    pub payer: AccountInfo<'info>,
+    pub system_program: Program<'info, System>,
+    /// CHECK:
+    #[account(mut)]
+    pub member_0: AccountInfo<'info>,
+    /// CHECK:
+    #[account(mut)]
+    pub member_1: AccountInfo<'info>,
+    /// CHECK:
+    #[account(mut)]
+    pub member_2: AccountInfo<'info>,
+    /// CHECK:
+    #[account(mut)]
+    pub member_3: AccountInfo<'info>,
+    /// CHECK:
+    #[account(mut)]
+    pub member_4: AccountInfo<'info>,
+    /// CHECK:
+    #[account(mut)]
+    pub member_5: AccountInfo<'info>,
+    /// CHECK:
+    #[account(mut)]
+    pub member_6: AccountInfo<'info>,
+    /// CHECK:
+    #[account(mut)]
+    pub member_7: AccountInfo<'info>,
+    /// CHECK:
+    #[account(mut)]
+    pub member_8: AccountInfo<'info>,
+    /// CHECK:
+    #[account(mut)]
+    pub member_9: AccountInfo<'info>,
 }
 
 #[account]
