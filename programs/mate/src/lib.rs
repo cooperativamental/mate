@@ -3,7 +3,7 @@ use anchor_lang::{
     solana_program::{program::invoke, system_instruction},
 };
 
-declare_id!("5LF9R3vBrXDF3vKMyaWjk4BrNZonK1CgTXt89FmBbLA5");
+declare_id!("6UGMmkzeousfKxCkgfPW4LfeetXEptSiBP8EsM12uvxh");
 
 #[program]
 pub mod mate {
@@ -81,22 +81,23 @@ pub mod mate {
             &mut ctx.accounts.member_9,
         ];
         ctx.accounts.project.payments.iter().for_each(|payment| {
-            msg!("algo");
             let found = members
                 .iter()
                 .find(|account| account.key == &payment.member);
             match found {
-                Some(member) => invoke(
+                Some(member) => {
+                    msg!("Paying {:#?} Lamports to {:#?}", payment.amount ,payment.member);
+                    invoke(
                     &system_instruction::transfer(
                         ctx.accounts.payer.key,
                         &payment.member,
-                        1,
+                        payment.amount,
                     ),
                     &[
                         ctx.accounts.payer.to_account_info().clone(),
                         member.to_account_info().clone(),
                     ],
-                ),
+                )},
                 None => Ok(()),
             };
         });
@@ -114,7 +115,7 @@ pub struct CreateGroup<'info> {
     #[account(
         init,
         payer = initializer,
-        space = 9000
+        space = 600
     )]
     pub group: Account<'info, Group>,
     /// CHECK:
@@ -129,7 +130,7 @@ pub struct CreateProject<'info> {
     #[account(
         init,
         payer = initializer,
-        space = 9000
+        space = 600
     )]
     pub project: Account<'info, Project>,
     /// CHECK:

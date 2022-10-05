@@ -2,9 +2,9 @@
 seeds = false
 skip-lint = false
 [programs.localnet]
-mate = "6VdcN2k1Fm2S5EpGxvXHggDoCwRCqt9XT8u8jNxJaNmw"
+mate = "6UGMmkzeousfKxCkgfPW4LfeetXEptSiBP8EsM12uvxh"
 [programs.devnet]
-mate = "6VdcN2k1Fm2S5EpGxvXHggDoCwRCqt9XT8u8jNxJaNmw"
+mate = "6UGMmkzeousfKxCkgfPW4LfeetXEptSiBP8EsM12uvxh"
 
 [registry]
 url = "https://anchor.projectserum.com"
