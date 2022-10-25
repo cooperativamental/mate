@@ -3,26 +3,31 @@ use anchor_lang::{
     solana_program::{program::invoke, system_instruction},
 };
 
-declare_id!("6UGMmkzeousfKxCkgfPW4LfeetXEptSiBP8EsM12uvxh");
+declare_id!("Fc19UeryCARMX4pDJeqLGwHNy9StmgdGqkXke4aVggtL");
 
 #[program]
 pub mod mate {
     use super::*;
 
+    
     pub fn create_group(
         ctx: Context<CreateGroup>,
         name: String,
         ratio: u16,
         members: Vec<Pubkey>,
     ) -> Result<()> {
+
         let group = &mut ctx.accounts.group;
-
-        group.name = name;
+        group.name = (*name).to_string();
         group.ratio = ratio;
-        group.treasury = *ctx.accounts.treasury.key;
         group.members = members;
+        group.treasury = *ctx.accounts.treasury.key;
+        group.bump = *ctx.bumps.get("group").unwrap();
 
-        msg!("Group {:#?} Created!", group.name);
+        // Emit event
+        emit!(GroupChanged {
+            name
+        });
 
         Ok(())
     }
@@ -111,17 +116,22 @@ pub mod mate {
 }
 
 #[derive(Accounts)]
+#[instruction(name: String)]
 pub struct CreateGroup<'info> {
+
     #[account(
         init,
-        payer = initializer,
-        space = 600
+        payer = payer,
+        space = 9000,
+        seeds = [b"group".as_ref(), name.as_ref()],
+        bump
     )]
     pub group: Account<'info, Group>,
-    /// CHECK:
+        /// CHECK:
     pub treasury: AccountInfo<'info>,
+    /// CHECK:
     #[account(mut)]
-    pub initializer: Signer<'info>,
+    pub payer: AccountInfo<'info>,
     pub system_program: Program<'info, System>,
 }
 
@@ -186,8 +196,8 @@ pub struct Group {
     pub treasury: Pubkey,
     pub ratio: u16,
     pub members: Vec<Pubkey>,
+    pub bump: u8,
 }
-
 #[account]
 pub struct Project {
     pub name: String,
@@ -209,4 +219,9 @@ pub struct Project {
 pub struct Payment {
     member: Pubkey,
     amount: u64,
+}
+
+#[event]
+pub struct GroupChanged {
+    pub name: String
 }
