@@ -3,6 +3,7 @@ import { Program } from "@project-serum/anchor";
 import { Mate } from "../target/types/mate";
 import { assert } from "chai"
 import * as web3 from "@solana/web3.js"
+import { PublicKey, SystemProgram} from "@solana/web3.js"
 
 describe("We create a project", () => {
   const anchorProvider = anchor.AnchorProvider.env();
@@ -11,7 +12,14 @@ describe("We create a project", () => {
   const program = anchor.workspace.Mate as Program<Mate>;
 
   it("Can create a project", async () => {
-    const name = "project"
+    const name = "project name"
+    const group = "group"
+    const project_type = "project_type"
+    const ratio = 10
+    const payments = []
+    const currency = "SOL"
+    const amount = new anchor.BN(20)
+    const client = new PublicKey('5xot9PVkphiX2adznghwrAuxGs2zeWisNSxMW6hU6Hkj')
     const member0 = anchor.web3.Keypair.generate();
     const member1 = anchor.web3.Keypair.generate();
     const member2 = anchor.web3.Keypair.generate();
@@ -32,19 +40,15 @@ describe("We create a project", () => {
     await program.methods
       .createProjectPda(
         name,
-        10,
-        [
-          member0.publicKey,
-          member1.publicKey,
-          member2.publicKey,
-          member3.publicKey,
-          member4.publicKey,
-          member5.publicKey,
-          member6.publicKey,
-          member7.publicKey,
-          member8.publicKey,
-          member9.publicKey,
-        ]
+        group,
+        project_type,
+        ratio,
+        payments,
+        currency,
+        amount,
+        new anchor.BN(Date.now()),
+        new anchor.BN(Date.now()),
+        client
         )
       .accounts({
         project: groupPublicKey,

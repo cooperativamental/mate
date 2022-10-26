@@ -3,7 +3,7 @@ use anchor_lang::{
     solana_program::{program::invoke, system_instruction},
 };
 
-declare_id!("GSQFxyFt53BBpvF1e3HqVHRyksC76vvFdjYKxP6NcNZ");
+declare_id!("64YrzvsTuj2AqCxFRJ4EaQebNg7yY2nsU9KXWtd8oKuQ");
 
 #[program]
 pub mod mate {
@@ -32,15 +32,29 @@ pub mod mate {
     pub fn create_project_pda(
         ctx: Context<CreateProject>,
         name: String,
+        group: String,
+        project_type: String,
         ratio: u16,
-        members: Vec<Pubkey>,
+        payments: Vec<Payment>,
+        currency: String,
+        amount: u64,
+        start_date: u64,
+        end_date: u64,
+        client: Pubkey,
     ) -> Result<()> {
-        let group = &mut ctx.accounts.project;
-        group.name = (*name).to_string();
-        group.ratio = ratio;
-        group.members = members;
-        group.treasury = *ctx.accounts.treasury.key;
-        group.bump = *ctx.bumps.get("project").unwrap();
+        let project = &mut ctx.accounts.project;
+        project.name = (*name).to_string();
+        project.group = group;
+        project.project_type = project_type;
+        project.ratio = ratio;
+        project.treasury = *ctx.accounts.treasury.key;
+        project.payments = payments;
+        project.currency = currency;
+        project.status = "INITIALIZATED".to_string();
+        project.amount = amount;
+        project.start_date = start_date;
+        project.end_date = end_date;
+        project.client = client;
 
         Ok(())
     }
@@ -97,9 +111,19 @@ pub struct Group {
 #[account]
 pub struct Project {
     pub name: String,
+    pub group: String,
+    pub project_type: String,
     pub treasury: Pubkey,
     pub ratio: u16,
-    pub members: Vec<Pubkey>,
+    pub payments: Vec<Payment>,
+    pub currency: String,
+    pub status: String,
+    pub amount: u64,
+    pub common_expenses: u64,
+    pub start_date: u64,
+    pub end_date: u64,
+    pub client: Pubkey,
+    pub milestones: u8,
     pub bump: u8,
 }
 
