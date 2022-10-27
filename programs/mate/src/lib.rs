@@ -3,7 +3,7 @@ use anchor_lang::{
     solana_program::{program::invoke, system_instruction},
 };
 
-declare_id!("9sZtGXc8pwbS3R1SoECKWKWSKDhQR4AuCBDHGPU59oMd");
+declare_id!("3gzDR5dYBfKF21QZSWMiCR7bMar9o9hYV13pQ5co16xo");
 
 #[program]
 pub mod mate {
@@ -124,13 +124,13 @@ pub struct CreateGroup<'info> {
 }
 
 #[derive(Accounts)]
-#[instruction(name: String)]
+#[instruction(name: String, group: String)]
 pub struct CreateProject<'info> {
     #[account(
         init,
         payer = payer,
         space = 9000,
-        seeds = [b"project".as_ref(), name.as_ref()],
+        seeds = [b"project".as_ref(), name.as_ref(), group.as_ref()],
         bump
     )]
     pub project: Account<'info, Project>,

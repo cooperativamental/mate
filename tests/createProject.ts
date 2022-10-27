@@ -3,7 +3,7 @@ import { Program } from "@project-serum/anchor";
 import { Mate } from "../target/types/mate";
 import { assert } from "chai"
 import * as web3 from "@solana/web3.js"
-import { PublicKey, SystemProgram} from "@solana/web3.js"
+import { PublicKey, SystemProgram } from "@solana/web3.js"
 
 describe("We create a project", () => {
   const anchorProvider = anchor.AnchorProvider.env();
@@ -31,12 +31,12 @@ describe("We create a project", () => {
     const member8 = anchor.web3.Keypair.generate();
     const member9 = anchor.web3.Keypair.generate();
     const treasury = anchor.web3.Keypair.generate();
-  
+
     const [groupPublicKey] = web3.PublicKey.findProgramAddressSync(
-      [Buffer.from("project"), Buffer.from(name)],
+  [Buffer.from("project"), Buffer.from(name), Buffer.from(group)],
       program.programId,
     )
-  
+
     await program.methods
       .createProjectPda(
         name,
@@ -49,7 +49,7 @@ describe("We create a project", () => {
         new anchor.BN(Date.now()),
         new anchor.BN(Date.now()),
         client
-        )
+      )
       .accounts({
         project: groupPublicKey,
         treasury: treasury.publicKey,
@@ -57,10 +57,9 @@ describe("We create a project", () => {
         systemProgram: web3.SystemProgram.programId,
       })
       .rpc()
-  
+
     const storedGroup = await program.account.project.fetch(groupPublicKey)
     console.log(storedGroup)
     assert.equal(storedGroup.name, name)
-
   });
 });
