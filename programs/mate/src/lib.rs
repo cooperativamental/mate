@@ -3,7 +3,7 @@ use anchor_lang::{
     solana_program::{program::invoke, system_instruction},
 };
 
-declare_id!("3gzDR5dYBfKF21QZSWMiCR7bMar9o9hYV13pQ5co16xo");
+declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
 
 #[program]
 pub mod mate {
@@ -29,7 +29,7 @@ pub mod mate {
         Ok(())
     }
 
-    pub fn create_project_pda(
+    pub fn create_project(
         ctx: Context<CreateProject>,
         name: String,
         group: String,
@@ -212,8 +212,8 @@ pub struct Project {
 
 #[derive(Debug, Clone, AnchorSerialize, AnchorDeserialize)]
 pub struct Payment {
-    member: Pubkey,
-    amount: u64,
+    pub member: Pubkey,
+    pub amount: u64,
 }
 
 #[event]

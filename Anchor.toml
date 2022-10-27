@@ -2,7 +2,7 @@
 seeds = false
 skip-lint = false
 [programs.localnet]
-mate = "3gzDR5dYBfKF21QZSWMiCR7bMar9o9hYV13pQ5co16xo"
+mate = "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
 [programs.devnet]
 mate = "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
 

@@ -13,10 +13,6 @@ const name = "Will Pay"
 const group = "group"
 const project_type = "project_type"
 const ratio = 10
-const payments = []
-const currency = "SOL"
-const amount = new anchor.BN(20)
-const client = new PublicKey('Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS')
 
 const member0 = anchor.web3.Keypair.generate();
 const member1 = anchor.web3.Keypair.generate();
@@ -28,6 +24,14 @@ const member6 = anchor.web3.Keypair.generate();
 const member7 = anchor.web3.Keypair.generate();
 const member8 = anchor.web3.Keypair.generate();
 const member9 = anchor.web3.Keypair.generate();
+const payments = [
+  {member: member0.publicKey,
+    amount:new anchor.BN(1),
+  }
+]
+const currency = "SOL"
+const amount = new anchor.BN(20)
+const client = new PublicKey('Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS')
 const treasury = anchor.web3.Keypair.generate();
 
 const [groupPublicKey] = web3.PublicKey.findProgramAddressSync(
@@ -38,7 +42,7 @@ const [groupPublicKey] = web3.PublicKey.findProgramAddressSync(
 describe("We Create a Project and then pay for it", () => {
   it("Creating 'will pay' project...", async () => {
     await program.methods
-      .createProjectPda(
+      .createProject(
         name,
         group,
         project_type,

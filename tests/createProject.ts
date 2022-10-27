@@ -16,7 +16,6 @@ describe("We create a project", () => {
     const group = "group name"
     const project_type = "project_type"
     const ratio = 10
-    const payments = []
     const currency = "SOL"
     const amount = new anchor.BN(20)
     const client = new PublicKey('5xot9PVkphiX2adznghwrAuxGs2zeWisNSxMW6hU6Hkj')
@@ -31,6 +30,9 @@ describe("We create a project", () => {
     const member8 = anchor.web3.Keypair.generate();
     const member9 = anchor.web3.Keypair.generate();
     const treasury = anchor.web3.Keypair.generate();
+    const payments = [
+      
+      ]
 
     const [groupPublicKey] = web3.PublicKey.findProgramAddressSync(
   [Buffer.from("project"), Buffer.from(name), Buffer.from(group)],
@@ -38,7 +40,7 @@ describe("We create a project", () => {
     )
 
     await program.methods
-      .createProjectPda(
+      .createProject(
         name,
         group,
         project_type,
