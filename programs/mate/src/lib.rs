@@ -57,6 +57,26 @@ pub mod mate {
         Ok(())
     }
 
+    pub fn use_project_treasury(ctx: Context<UseProjectTreasury>, amount: u64) -> Result<()> {
+        invoke(
+            &system_instruction::transfer(
+                ctx.accounts.payer.key,
+                &ctx.accounts.receiver.key,
+                amount,
+            ),
+            &[
+                ctx.accounts.payer.to_account_info().clone(),
+                ctx.accounts.receiver.to_account_info().clone(),
+            ],
+        )?;
+        let project = &mut ctx.accounts.project;
+        project.status = "PAYED".to_string();
+
+        msg!("{:#?} Payed from project \"{:#?}\" treasury", amount, project.name);
+
+        Ok(())
+    }
+
     pub fn pay_project(ctx: Context<PayProject>) -> Result<()> {
         let project = &ctx.accounts.project;
         let members = [
@@ -185,6 +205,19 @@ pub struct PayProject<'info> {
     /// CHECK:
     #[account(mut)]
     pub member_9: AccountInfo<'info>,
+}
+
+#[derive(Accounts)]
+pub struct UseProjectTreasury<'info> {
+    #[account(mut)]
+    pub project: Account<'info, Project>,
+    /// CHECK:
+    #[account(mut)]
+    pub payer: AccountInfo<'info>,
+    /// CHECK:
+    #[account(mut)]
+    pub receiver: AccountInfo<'info>,
+    pub system_program: Program<'info, System>,
 }
 
 #[account]

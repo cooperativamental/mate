@@ -9,8 +9,8 @@ anchor.setProvider(anchorProvider);
 const program = anchor.workspace.Mate as Program<Mate>;
 
 const payer = (program.provider as anchor.AnchorProvider).wallet;
-const name = "Will Pay for this Proj"
-const group =  "A Group's Name"
+const name = "TEST Project"
+const group =  "Test Group's Name"
 const project_type = "project_type"
 const ratio = 10
 
@@ -84,14 +84,13 @@ describe("We Create a Project and then pay for it", () => {
       )
       .accounts({
         project: pdaPublicKey,
-        treasury: treasury.publicKey,
         payer: anchorProvider.wallet.publicKey,
         systemProgram: web3.SystemProgram.programId,
       })
       .rpc()
   });
 
-  it("modifing project...", async () => {
+  it("paying project...", async () => {
     const tx = await program.methods.payProject()
       .accounts({
         payer: payer.publicKey,
@@ -106,6 +105,18 @@ describe("We Create a Project and then pay for it", () => {
         member7: member7,
         member8: member8,
         member9: member9,
+        systemProgram: SystemProgram.programId,
+      })
+      .rpc();
+    console.log(`https://explorer.solana.com/tx/${tx}?cluster=devnet`);
+  });
+
+  it("using project treasury...", async () => {
+    const tx = await program.methods.useProjectTreasury(new anchor.BN(10))
+      .accounts({
+        payer: payer.publicKey,
+        project: pdaPublicKey,
+        receiver:member2,
         systemProgram: SystemProgram.programId,
       })
       .rpc();
