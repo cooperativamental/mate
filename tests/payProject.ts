@@ -9,8 +9,8 @@ anchor.setProvider(anchorProvider);
 const program = anchor.workspace.Mate as Program<Mate>;
 
 const payer = (program.provider as anchor.AnchorProvider).wallet;
-const name = "Will Pay"
-const group = "group"
+const name = "Will Pay for this Proj"
+const group =  "A Group's Name"
 const project_type = "project_type"
 const ratio = 10
 
