@@ -19,7 +19,6 @@ pub mod mate {
         group.name = (*name).to_string();
         group.ratio = ratio;
         group.members = members;
-        group.treasury = *ctx.accounts.treasury.key;
         group.bump = *ctx.bumps.get("group").unwrap();
 
         emit!(GroupChanged {
@@ -47,7 +46,6 @@ pub mod mate {
         project.group = group;
         project.project_type = project_type;
         project.ratio = ratio;
-        project.treasury = *ctx.accounts.treasury.key;
         project.payments = payments;
         project.currency = currency;
         project.status = "INITIALIZATED".to_string();
@@ -55,6 +53,26 @@ pub mod mate {
         project.start_date = start_date;
         project.end_date = end_date;
         project.client = client;
+
+        Ok(())
+    }
+
+    pub fn use_project_treasury(ctx: Context<UseProjectTreasury>, amount: u64) -> Result<()> {
+        invoke(
+            &system_instruction::transfer(
+                ctx.accounts.payer.key,
+                &ctx.accounts.receiver.key,
+                amount,
+            ),
+            &[
+                ctx.accounts.payer.to_account_info().clone(),
+                ctx.accounts.receiver.to_account_info().clone(),
+            ],
+        )?;
+        let project = &mut ctx.accounts.project;
+        project.status = "PAYED".to_string();
+
+        msg!("{:#?} Payed from project \"{:#?}\" treasury", amount, project.name);
 
         Ok(())
     }
@@ -94,6 +112,17 @@ pub mod mate {
                 None => Ok(()),
             };
         });
+        invoke(
+            &system_instruction::transfer(
+                ctx.accounts.payer.key,
+                &ctx.accounts.project.key(),
+                project.amount / project.ratio as u64,
+            ),
+            &[
+                ctx.accounts.payer.to_account_info().clone(),
+                ctx.accounts.project.to_account_info().clone(),
+            ],
+        )?;
         let project = &mut ctx.accounts.project;
         project.status = "PAYED".to_string();
 
@@ -110,13 +139,11 @@ pub struct CreateGroup<'info> {
     #[account(
         init,
         payer = payer,
-        space = 9000,
+        space = 900,
         seeds = [b"group".as_ref(), name.as_ref()],
         bump
     )]
     pub group: Account<'info, Group>,
-    /// CHECK:
-    pub treasury: AccountInfo<'info>,
     /// CHECK:
     #[account(mut)]
     pub payer: AccountInfo<'info>,
@@ -129,13 +156,11 @@ pub struct CreateProject<'info> {
     #[account(
         init,
         payer = payer,
-        space = 9000,
+        space = 900,
         seeds = [b"project".as_ref(), name.as_ref(), group.as_ref()],
         bump
     )]
     pub project: Account<'info, Project>,
-    /// CHECK:
-    pub treasury: AccountInfo<'info>,
     /// CHECK:
     #[account(mut)]
     pub payer: AccountInfo<'info>,
@@ -182,10 +207,22 @@ pub struct PayProject<'info> {
     pub member_9: AccountInfo<'info>,
 }
 
+#[derive(Accounts)]
+pub struct UseProjectTreasury<'info> {
+    #[account(mut)]
+    pub project: Account<'info, Project>,
+    /// CHECK:
+    #[account(mut)]
+    pub payer: AccountInfo<'info>,
+    /// CHECK:
+    #[account(mut)]
+    pub receiver: AccountInfo<'info>,
+    pub system_program: Program<'info, System>,
+}
+
 #[account]
 pub struct Group {
     pub name: String,
-    pub treasury: Pubkey,
     pub ratio: u16,
     pub members: Vec<Pubkey>,
     pub bump: u8,
@@ -196,7 +233,6 @@ pub struct Project {
     pub name: String,
     pub group: String,
     pub project_type: String,
-    pub treasury: Pubkey,
     pub ratio: u16,
     pub payments: Vec<Payment>,
     pub currency: String,

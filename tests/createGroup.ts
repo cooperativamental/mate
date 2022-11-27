@@ -11,7 +11,7 @@ describe("We create a group", () => {
   const program = anchor.workspace.Mate as Program<Mate>;
 
   it("Can create a group", async () => {
-    const name = "Group Name"
+    const name = "Group's Name"
     const member0 = anchor.web3.Keypair.generate();
     const member1 = anchor.web3.Keypair.generate();
     const member2 = anchor.web3.Keypair.generate();
@@ -48,7 +48,6 @@ describe("We create a group", () => {
         )
       .accounts({
         group: groupPublicKey,
-        treasury: treasury.publicKey,
         payer: anchorProvider.wallet.publicKey,
         systemProgram: web3.SystemProgram.programId,
       })
