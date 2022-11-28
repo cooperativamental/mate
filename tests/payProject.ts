@@ -9,7 +9,7 @@ anchor.setProvider(anchorProvider);
 const program = anchor.workspace.Mate as Program<Mate>;
 
 const payer = (program.provider as anchor.AnchorProvider).wallet;
-const name = "TEST Project"
+const name = "¡Test Project!"
 const group =  "Test Group's Name"
 const project_type = "project_type"
 const ratio = 10
@@ -112,7 +112,7 @@ describe("We Create a Project and then pay for it", () => {
   });
 
   it("using project treasury...", async () => {
-    const tx = await program.methods.useProjectTreasury(new anchor.BN(10))
+    const tx = await program.methods.useProjectTreasury(new anchor.BN(1))
       .accounts({
         payer: payer.publicKey,
         project: pdaPublicKey,
