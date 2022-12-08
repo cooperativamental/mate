@@ -11,7 +11,7 @@ describe("We create a group", () => {
   const program = anchor.workspace.Mate as Program<Mate>;
 
   it("Can create a group", async () => {
-    const name = "-Group Name-"
+    const name = "Group Name"
     const member0 = anchor.web3.Keypair.generate();
     const member1 = anchor.web3.Keypair.generate();
     const member2 = anchor.web3.Keypair.generate();
@@ -22,7 +22,6 @@ describe("We create a group", () => {
     const member7 = anchor.web3.Keypair.generate();
     const member8 = anchor.web3.Keypair.generate();
     const member9 = anchor.web3.Keypair.generate();
-    const treasury = anchor.web3.Keypair.generate();
   
     const [groupPublicKey] = web3.PublicKey.findProgramAddressSync(
       [Buffer.from("group"), Buffer.from(name)],

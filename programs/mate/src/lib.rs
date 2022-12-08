@@ -3,7 +3,7 @@ use anchor_lang::{
     solana_program::{program::invoke, system_instruction},
 };
 
-declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
+declare_id!("9J76wGuSfdWBbJma8hCTiskqyv5rTSt1y1D8JaBxMmMQ");
 
 #[program]
 pub mod mate {

@@ -11,8 +11,8 @@ describe("We create a project", () => {
   const program = anchor.workspace.Mate as Program<Mate>;
 
   it("Can create a project", async () => {
-    const name = "-Project Name-"
-    const group = "Group Name-"
+    const name = "Marche Payment Test"
+    const group = "Group Name"
     const project_type = "project_type"
     const ratio = 10
     const currency = "SOL"
@@ -71,7 +71,6 @@ describe("We create a project", () => {
       },
     ] as unknown as Mate["types"][0]
 
-    const treasury = anchor.web3.Keypair.generate();
     const [pdaPublicKey] = web3.PublicKey.findProgramAddressSync(
       [Buffer.from("project"), Buffer.from(name), Buffer.from(group)],
       program.programId,
@@ -98,6 +97,7 @@ describe("We create a project", () => {
       .rpc()
 
     const storedProject = await program.account.project.fetch(pdaPublicKey)
+    console.log("--", pdaPublicKey)
     console.log(storedProject)
     assert.equal(storedProject.name, name)
   });

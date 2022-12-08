@@ -1,0 +1,39 @@
+{
+  "name": "",
+  "isOrdered": true,
+  "folders": {
+    "app": {
+      "name": "app",
+      "isOrdered": true,
+      "folders": {},
+      "files": {}
+    },
+    "migrations": {
+      "name": "migrations",
+      "isOrdered": true,
+      "folders": {},
+      "files": {}
+    },
+    "programs": {
+      "name": "programs",
+      "isOrdered": true,
+      "folders": {},
+      "files": {}
+    },
+    "target": {
+      "name": "target",
+      "isOrdered": true,
+      "folders": {},
+      "files": {}
+    },
+    "tests": {
+      "name": "tests",
+      "isOrdered": true,
+      "folders": {},
+      "files": {}
+    }
+  },
+  "files": {
+    "README": 0
+  }
+}
