@@ -19,7 +19,13 @@ For the Front End project go to: [https://github.com/cooperativamental/MATE-app]
 6. Set correct program id
     `anchor keys list`
     replace all ocurrences of Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS with the resulting key and save the files
-7. Deploy and run tests
+7. Set localhost as target
+    `solana config set --url http://localhost:8899`
+8. Create a dev CLI wallet
+    `solana-keygen new -o dev_account.json`
+9. Airdrop some fake SOL to that wallet
+    `solana airdrop 10 dev_account.json`
+10. Deploy and run tests
     `anchor test --skip-local-validator`
     If all test pass you are all set up
 
