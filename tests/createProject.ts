@@ -11,7 +11,7 @@ describe("We create a project", () => {
   const program = anchor.workspace.Mate as Program<Mate>;
 
   it("Can create a project", async () => {
-    const name = "Marche Payment Test"
+    const name = "Project Name"
     const group = "Group Name"
     const project_type = "project_type"
     const ratio = 10
@@ -97,7 +97,6 @@ describe("We create a project", () => {
       .rpc()
 
     const storedProject = await program.account.project.fetch(pdaPublicKey)
-    console.log("--", pdaPublicKey)
     console.log(storedProject)
     assert.equal(storedProject.name, name)
   });
