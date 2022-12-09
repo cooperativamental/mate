@@ -36,3 +36,8 @@ For the Front End project go to: [https://github.com/cooperativamental/MATE-app]
 | milestone(\*) | - | "milestone", (project)name, (group)name, order: u8 |
 
 *(\*) in This first version the milestone PDA isn´t implented, there is only one milestone per project, in the next iteration the milestone feature will be implemented.*
+
+### Aditional documentation
+
+Running `cargo doc` in a terminal will outputs a folder named `target/doc` wich contains very detailed documentation of the project and his depencies,
+We recommend `/target/doc/mate/index.html` as an entrypoint.
