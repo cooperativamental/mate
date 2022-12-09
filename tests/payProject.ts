@@ -60,7 +60,6 @@ const payments = [
 const currency = "SOL"
 const amount = new anchor.BN(20)
 const client = new PublicKey('Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS')
-const treasury = anchor.web3.Keypair.generate();
 
 const [pdaPublicKey] = web3.PublicKey.findProgramAddressSync(
   [Buffer.from("project"), Buffer.from(name), Buffer.from(group)],
