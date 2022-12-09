@@ -1,3 +1,5 @@
+#![doc = include_str!("../../../README.MD")]
+
 use anchor_lang::{
     prelude::*,
     solana_program::{program::invoke, system_instruction},
