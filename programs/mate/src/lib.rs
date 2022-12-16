@@ -5,7 +5,7 @@ use anchor_lang::{
     solana_program::{program::invoke, system_instruction},
 };
 
-declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
+declare_id!("9J76wGuSfdWBbJma8hCTiskqyv5rTSt1y1D8JaBxMmMQ");
 
 #[program]
 pub mod mate {
@@ -104,17 +104,32 @@ pub mod mate {
                 None => Ok(()),
             };
         });
+        if ctx.accounts.group.ratio > 0 {
+            invoke(
+                &system_instruction::transfer(
+                    ctx.accounts.payer.key,
+                    &ctx.accounts.project.key(),
+                    project.amount / ctx.accounts.group.ratio as u64,
+                ),
+                &[
+                    ctx.accounts.payer.to_account_info().clone(),
+                    ctx.accounts.group.to_account_info().clone(),
+                ],
+            )?;
+        }
+        if project.ratio > 0 {
         invoke(
             &system_instruction::transfer(
                 ctx.accounts.payer.key,
-                &ctx.accounts.project.key(),
+                &ctx.accounts.group.key(),
                 project.amount / project.ratio as u64,
             ),
             &[
                 ctx.accounts.payer.to_account_info().clone(),
-                ctx.accounts.project.to_account_info().clone(),
+                ctx.accounts.group.to_account_info().clone(),
             ],
         )?;
+    }
         let project = &mut ctx.accounts.project;
         project.status = "PAYED".to_string();
 
@@ -166,7 +181,9 @@ pub struct PayProject<'info> {
     /// CHECK:
     #[account(mut)]
     pub payer: AccountInfo<'info>,
-    pub system_program: Program<'info, System>,
+    /// CHECK:
+    #[account(mut)]
+    pub group: UncheckedAccount<'info>,
     /// CHECK:
     #[account(mut)]
     pub member_0: AccountInfo<'info>,
@@ -197,6 +214,7 @@ pub struct PayProject<'info> {
     /// CHECK:
     #[account(mut)]
     pub member_9: AccountInfo<'info>,
+    pub system_program: Program<'info, System>,
 }
 
 #[derive(Accounts)]
