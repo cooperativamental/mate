@@ -5,7 +5,7 @@ use anchor_lang::{
     solana_program::{program::invoke, system_instruction},
 };
 
-declare_id!("9J76wGuSfdWBbJma8hCTiskqyv5rTSt1y1D8JaBxMmMQ");
+declare_id!("2CNaUh5Kkefntj1D6xp6r1se5PmghdizNBu6dwthVnrw");
 
 #[program]
 pub mod mate {
@@ -183,7 +183,7 @@ pub struct PayProject<'info> {
     pub payer: AccountInfo<'info>,
     /// CHECK:
     #[account(mut)]
-    pub group: UncheckedAccount<'info>,
+    pub group: Account<'info, Group>,
     /// CHECK:
     #[account(mut)]
     pub member_0: AccountInfo<'info>,

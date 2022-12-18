@@ -11,7 +11,7 @@ describe("We create a group", () => {
   const program = anchor.workspace.Mate as Program<Mate>;
 
   it("Can create a group", async () => {
-    const name = "Group Name"
+    const name = " "
     const member0 = anchor.web3.Keypair.generate();
     const member1 = anchor.web3.Keypair.generate();
     const member2 = anchor.web3.Keypair.generate();
@@ -31,7 +31,7 @@ describe("We create a group", () => {
     await program.methods
       .createGroup(
         name,
-        10,
+        0,
         [
           member0.publicKey,
           member1.publicKey,

@@ -12,7 +12,7 @@ describe("We create a project", () => {
 
   it("Can create a project", async () => {
     const name = "Project Name"
-    const group = "Group Name"
+    const group = ""
     const project_type = "project_type"
     const ratio = 10
     const currency = "SOL"
