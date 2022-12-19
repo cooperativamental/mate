@@ -9,8 +9,8 @@ anchor.setProvider(anchorProvider);
 const program = anchor.workspace.Mate as Program<Mate>;
 
 const payer = (program.provider as anchor.AnchorProvider).wallet;
-const name = "¡Test Project!"
-const group =  ""
+const name = " I Will Pay"
+const group =  "Group"
 const project_type = "project_type"
 const ratio = 10
 
@@ -62,7 +62,7 @@ const amount = new anchor.BN(20)
 const client = new PublicKey('Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS')
 
 const [groupPublicKey] = web3.PublicKey.findProgramAddressSync(
-  [Buffer.from("group"), Buffer.from("")],
+  [Buffer.from("group"), Buffer.from(group)],
   program.programId,
 )
 

@@ -5,12 +5,12 @@ use anchor_lang::{
     solana_program::{program::invoke, system_instruction},
 };
 
-declare_id!("2CNaUh5Kkefntj1D6xp6r1se5PmghdizNBu6dwthVnrw");
+declare_id!("FGm2MQGMoHGyjKnkw38Q77L6qyJEy5dxmVpuFb2a9UbK");
 
 #[program]
 pub mod mate {
     use super::*;
-    
+
     pub fn create_group(
         ctx: Context<CreateGroup>,
         name: String,
@@ -23,9 +23,7 @@ pub mod mate {
         group.members = members;
         group.bump = *ctx.bumps.get("group").unwrap();
 
-        emit!(GroupChanged {
-            name
-        });
+        emit!(GroupChanged { name });
 
         Ok(())
     }
@@ -64,13 +62,18 @@ pub mod mate {
         **project.to_account_info().try_borrow_mut_lamports()? -= amount;
         **ctx.accounts.receiver.try_borrow_mut_lamports()? += amount;
 
-        msg!("{:#?} Payed from project \"{:#?}\" treasury", amount, project.name);
+        msg!(
+            "{:#?} Payed from project \"{:#?}\" treasury",
+            amount,
+            project.name
+        );
 
         Ok(())
     }
 
     pub fn pay_project(ctx: Context<PayProject>) -> Result<()> {
         let project = &ctx.accounts.project;
+        let group = &ctx.accounts.group;
         let members = [
             &mut ctx.accounts.member_0,
             &mut ctx.accounts.member_1,
@@ -89,27 +92,34 @@ pub mod mate {
                 .find(|account| account.key == &payment.member);
             match found {
                 Some(member) => {
-                    msg!("Paying {:#?} Lamports to {:#?}", payment.amount ,payment.member);
-                    invoke(
-                    &system_instruction::transfer(
-                        ctx.accounts.payer.key,
-                        &payment.member,
+                    msg!(
+                        "Paying {:#?} Lamports to {:#?}",
                         payment.amount,
-                    ),
-                    &[
-                        ctx.accounts.payer.to_account_info().clone(),
-                        member.to_account_info().clone(),
-                    ],
-                )},
+                        payment.member
+                    );
+                    invoke(
+                        &system_instruction::transfer(
+                            ctx.accounts.payer.key,
+                            &payment.member,
+                            payment.amount,
+                        ),
+                        &[
+                            ctx.accounts.payer.to_account_info().clone(),
+                            member.to_account_info().clone(),
+                        ],
+                    )
+                }
                 None => Ok(()),
             };
         });
-        if ctx.accounts.group.ratio > 0 {
+        if group.ratio > 0 {
+            let amount_to_group = project.amount / ctx.accounts.group.ratio as u64 * 10000;
+            msg!("Paying {:#?} Lamports to Group treasury", amount_to_group);
             invoke(
                 &system_instruction::transfer(
                     ctx.accounts.payer.key,
-                    &ctx.accounts.project.key(),
-                    project.amount / ctx.accounts.group.ratio as u64,
+                    &ctx.accounts.group.key(),
+                    amount_to_group,
                 ),
                 &[
                     ctx.accounts.payer.to_account_info().clone(),
@@ -118,18 +128,23 @@ pub mod mate {
             )?;
         }
         if project.ratio > 0 {
-        invoke(
-            &system_instruction::transfer(
-                ctx.accounts.payer.key,
-                &ctx.accounts.group.key(),
-                project.amount / project.ratio as u64,
-            ),
-            &[
-                ctx.accounts.payer.to_account_info().clone(),
-                ctx.accounts.group.to_account_info().clone(),
-            ],
-        )?;
-    }
+            let amount_to_project = project.amount / project.ratio as u64 * 10000;
+            msg!(
+                "Paying {:#?} Lamports to project treasury",
+                amount_to_project
+            );
+            invoke(
+                &system_instruction::transfer(
+                    ctx.accounts.payer.key,
+                    &ctx.accounts.project.key(),
+                    amount_to_project,
+                ),
+                &[
+                    ctx.accounts.payer.to_account_info().clone(),
+                    ctx.accounts.project.to_account_info().clone(),
+                ],
+            )?;
+        }
         let project = &mut ctx.accounts.project;
         project.status = "PAYED".to_string();
 
@@ -137,7 +152,6 @@ pub mod mate {
 
         Ok(())
     }
-
 }
 
 #[derive(Accounts)]
@@ -264,5 +278,5 @@ pub struct Payment {
 
 #[event]
 pub struct GroupChanged {
-    pub name: String
+    pub name: String,
 }
