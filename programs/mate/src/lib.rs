@@ -5,7 +5,7 @@ use anchor_lang::{
     solana_program::{program::invoke, system_instruction},
 };
 
-declare_id!("FGm2MQGMoHGyjKnkw38Q77L6qyJEy5dxmVpuFb2a9UbK");
+declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
 
 #[program]
 pub mod mate {
@@ -113,7 +113,7 @@ pub mod mate {
             };
         });
         if group.ratio > 0 {
-            let amount_to_group = project.amount / ctx.accounts.group.ratio as u64 * 10000;
+            let amount_to_group = project.amount * ctx.accounts.group.ratio as u64 / 10000;
             msg!("Paying {:#?} Lamports to Group treasury", amount_to_group);
             invoke(
                 &system_instruction::transfer(
@@ -128,7 +128,7 @@ pub mod mate {
             )?;
         }
         if project.ratio > 0 {
-            let amount_to_project = project.amount / project.ratio as u64 * 10000;
+            let amount_to_project = project.amount * project.ratio as u64 / 10000;
             msg!(
                 "Paying {:#?} Lamports to project treasury",
                 amount_to_project
