@@ -11,7 +11,7 @@ describe("We create a project", () => {
   const program = anchor.workspace.Mate as Program<Mate>;
 
   it("Can create a project", async () => {
-    const name = "Project's Name"
+    const name = "Project's Name "
     const group = "Groupß"
     const project_type = "project_type"
     const ratio = 10

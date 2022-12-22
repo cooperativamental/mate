@@ -11,7 +11,7 @@ describe("We create a group", () => {
   const program = anchor.workspace.Mate as Program<Mate>;
 
   it("Can create a group", async () => {
-    const name = "Group's Name"
+    const name = "Group's Name "
     const member0 = anchor.web3.Keypair.generate();
     const member1 = anchor.web3.Keypair.generate();
     const member2 = anchor.web3.Keypair.generate();
