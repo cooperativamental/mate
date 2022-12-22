@@ -9,8 +9,13 @@ anchor.setProvider(anchorProvider);
 const program = anchor.workspace.Mate as Program<Mate>;
 
 const payer = (program.provider as anchor.AnchorProvider).wallet;
-const name = " I Will Pay"
-const group =  "Group"
+const name = "I Will Pay This"
+const group =  ""
+
+const currency = "SOL"
+const amount = new anchor.BN(1 * web3.LAMPORTS_PER_SOL)
+const client = new PublicKey('Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS')
+
 const project_type = "project_type"
 const ratio = 10
 
@@ -57,9 +62,6 @@ const payments = [
   },
   ] as unknown as Mate["types"][0]
 
-const currency = "SOL"
-const amount = new anchor.BN(20)
-const client = new PublicKey('Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS')
 
 const [groupPublicKey] = web3.PublicKey.findProgramAddressSync(
   [Buffer.from("group"), Buffer.from(group)],

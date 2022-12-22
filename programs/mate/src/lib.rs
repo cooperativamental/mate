@@ -5,7 +5,7 @@ use anchor_lang::{
     solana_program::{program::invoke, system_instruction},
 };
 
-declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
+declare_id!("BRjfcsCNNaEx5WoY8hsSregr1pnGqFJtbCNcbvJM3ysc");
 
 #[program]
 pub mod mate {
@@ -46,9 +46,9 @@ pub mod mate {
         project.group = group;
         project.project_type = project_type;
         project.ratio = ratio;
-        project.payments = payments;
+        project.members = payments.iter().map(|payment|Member{member:payment.member, amount: payment.amount, status:"INVITED".to_string()}).collect();
         project.currency = currency;
-        project.status = "INITIALIZATED".to_string();
+        project.status = "STARTED".to_string();
         project.amount = amount;
         project.start_date = start_date;
         project.end_date = end_date;
@@ -86,7 +86,7 @@ pub mod mate {
             &mut ctx.accounts.member_8,
             &mut ctx.accounts.member_9,
         ];
-        ctx.accounts.project.payments.iter().for_each(|payment| {
+        ctx.accounts.project.members.iter().for_each(|payment| {
             let found = members
                 .iter()
                 .find(|account| account.key == &payment.member);
@@ -146,9 +146,9 @@ pub mod mate {
             )?;
         }
         let project = &mut ctx.accounts.project;
-        project.status = "PAYED".to_string();
+        project.status = "PAID".to_string();
 
-        msg!("Project {:#?} Payed!", project.name);
+        msg!("Project {:#?} Paid!", project.name);
 
         Ok(())
     }
@@ -160,7 +160,7 @@ pub struct CreateGroup<'info> {
     #[account(
         init,
         payer = payer,
-        space = 900,
+        space = 400,
         seeds = [b"group".as_ref(), name.as_ref()],
         bump
     )]
@@ -177,7 +177,7 @@ pub struct CreateProject<'info> {
     #[account(
         init,
         payer = payer,
-        space = 900,
+        space = 700,
         seeds = [b"project".as_ref(), name.as_ref(), group.as_ref()],
         bump
     )]
@@ -258,7 +258,7 @@ pub struct Project {
     pub group: String,
     pub project_type: String,
     pub ratio: u16,
-    pub payments: Vec<Payment>,
+    pub members: Vec<Member>,
     pub currency: String,
     pub status: String,
     pub amount: u64,
@@ -274,6 +274,13 @@ pub struct Project {
 pub struct Payment {
     pub member: Pubkey,
     pub amount: u64,
+}
+
+#[derive(Debug, Clone, AnchorSerialize, AnchorDeserialize)]
+pub struct Member {
+    pub member: Pubkey,
+    pub amount: u64,
+    pub status: String,
 }
 
 #[event]
