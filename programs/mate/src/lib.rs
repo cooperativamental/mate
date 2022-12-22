@@ -5,7 +5,7 @@ use anchor_lang::{
     solana_program::{program::invoke, system_instruction},
 };
 
-declare_id!("FGm2MQGMoHGyjKnkw38Q77L6qyJEy5dxmVpuFb2a9UbK");
+declare_id!("BRjfcsCNNaEx5WoY8hsSregr1pnGqFJtbCNcbvJM3ysc");
 
 #[program]
 pub mod mate {
@@ -46,27 +46,20 @@ pub mod mate {
         project.group = group;
         project.project_type = project_type;
         project.ratio = ratio;
-        project.payments = payments;
+        project.members = payments
+            .iter()
+            .map(|payment| Member {
+                pubkey: payment.member,
+                amount: payment.amount,
+                status: "INVITED".to_string(),
+            })
+            .collect();
         project.currency = currency;
-        project.status = "INITIALIZATED".to_string();
+        project.status = "STARTED".to_string();
         project.amount = amount;
         project.start_date = start_date;
         project.end_date = end_date;
         project.client = client;
-
-        Ok(())
-    }
-
-    pub fn use_project_treasury(ctx: Context<UseProjectTreasury>, amount: u64) -> Result<()> {
-        let project = &mut ctx.accounts.project;
-        **project.to_account_info().try_borrow_mut_lamports()? -= amount;
-        **ctx.accounts.receiver.try_borrow_mut_lamports()? += amount;
-
-        msg!(
-            "{:#?} Payed from project \"{:#?}\" treasury",
-            amount,
-            project.name
-        );
 
         Ok(())
     }
@@ -86,21 +79,21 @@ pub mod mate {
             &mut ctx.accounts.member_8,
             &mut ctx.accounts.member_9,
         ];
-        ctx.accounts.project.payments.iter().for_each(|payment| {
+        ctx.accounts.project.members.iter().for_each(|payment| {
             let found = members
                 .iter()
-                .find(|account| account.key == &payment.member);
+                .find(|account| account.key == &payment.pubkey);
             match found {
                 Some(member) => {
                     msg!(
                         "Paying {:#?} Lamports to {:#?}",
                         payment.amount,
-                        payment.member
+                        payment.pubkey
                     );
                     invoke(
                         &system_instruction::transfer(
                             ctx.accounts.payer.key,
-                            &payment.member,
+                            &payment.pubkey,
                             payment.amount,
                         ),
                         &[
@@ -113,7 +106,7 @@ pub mod mate {
             };
         });
         if group.ratio > 0 {
-            let amount_to_group = project.amount / ctx.accounts.group.ratio as u64 * 10000;
+            let amount_to_group = project.amount * ctx.accounts.group.ratio as u64 / 10000;
             msg!("Paying {:#?} Lamports to Group treasury", amount_to_group);
             invoke(
                 &system_instruction::transfer(
@@ -128,7 +121,7 @@ pub mod mate {
             )?;
         }
         if project.ratio > 0 {
-            let amount_to_project = project.amount / project.ratio as u64 * 10000;
+            let amount_to_project = project.amount * project.ratio as u64 / 10000;
             msg!(
                 "Paying {:#?} Lamports to project treasury",
                 amount_to_project
@@ -146,9 +139,52 @@ pub mod mate {
             )?;
         }
         let project = &mut ctx.accounts.project;
-        project.status = "PAYED".to_string();
+        project.status = "PAID".to_string();
 
-        msg!("Project {:#?} Payed!", project.name);
+        msg!("Project {:#?} Paid!", project.name);
+
+        Ok(())
+    }
+
+    pub fn use_project_treasury(ctx: Context<UseProjectTreasury>, amount: u64) -> Result<()> {
+        let project = &mut ctx.accounts.project;
+        **project.to_account_info().try_borrow_mut_lamports()? -= amount;
+        **ctx.accounts.receiver.try_borrow_mut_lamports()? += amount;
+
+        msg!(
+            "{:#?} Payed from project \"{:#?}\" treasury",
+            amount,
+            project.name
+        );
+
+        Ok(())
+    }
+
+    pub fn confirm_project_participation(ctx: Context<ConfirmProjectParticipation>) -> Result<()> {
+        let project = &mut ctx.accounts.project;
+        let user = &mut ctx.accounts.user;
+        let members_status = project
+            .members
+            .iter()
+            .map(|member| Member {
+                pubkey: member.pubkey,
+                amount: member.amount,
+                status: if member.pubkey == user.to_account_info().key() {
+                    "CONFIRMED".to_string()
+                } else {
+                    (*member.status).to_string()
+                },
+            })
+            .collect();
+        project.members = members_status;
+
+        if project
+            .members
+            .iter()
+            .all(|member| member.status == "CONFIRMED")
+        {
+            project.status = "SIGNED".to_string()
+        }
 
         Ok(())
     }
@@ -160,7 +196,7 @@ pub struct CreateGroup<'info> {
     #[account(
         init,
         payer = payer,
-        space = 900,
+        space = 400,
         seeds = [b"group".as_ref(), name.as_ref()],
         bump
     )]
@@ -177,7 +213,7 @@ pub struct CreateProject<'info> {
     #[account(
         init,
         payer = payer,
-        space = 900,
+        space = 700,
         seeds = [b"project".as_ref(), name.as_ref(), group.as_ref()],
         bump
     )]
@@ -244,6 +280,16 @@ pub struct UseProjectTreasury<'info> {
     pub system_program: Program<'info, System>,
 }
 
+#[derive(Accounts)]
+pub struct ConfirmProjectParticipation<'info> {
+    #[account(mut)]
+    pub project: Account<'info, Project>,
+    /// CHECK:
+    #[account(mut)]
+    pub user: AccountInfo<'info>,
+    pub system_program: Program<'info, System>,
+}
+
 #[account]
 pub struct Group {
     pub name: String,
@@ -258,7 +304,7 @@ pub struct Project {
     pub group: String,
     pub project_type: String,
     pub ratio: u16,
-    pub payments: Vec<Payment>,
+    pub members: Vec<Member>,
     pub currency: String,
     pub status: String,
     pub amount: u64,
@@ -276,7 +322,20 @@ pub struct Payment {
     pub amount: u64,
 }
 
+#[derive(Debug, Clone, AnchorSerialize, AnchorDeserialize)]
+pub struct Member {
+    pub pubkey: Pubkey,
+    pub amount: u64,
+    pub status: String,
+}
+
 #[event]
 pub struct GroupChanged {
     pub name: String,
+}
+
+#[error_code]
+pub enum ErrorCode {
+    #[msg("User isn't a member of this project")]
+    NotMember,
 }

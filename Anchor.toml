@@ -2,7 +2,7 @@
 seeds = false
 skip-lint = false
 [programs.localnet]
-mate = "FGm2MQGMoHGyjKnkw38Q77L6qyJEy5dxmVpuFb2a9UbK"
+mate = "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
 [programs.devnet]
 mate = "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
 
@@ -10,7 +10,7 @@ mate = "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
 url = "https://anchor.projectserum.com"
 
 [provider]
-cluster = "localnet"
+cluster = "devnet"
 wallet = "dev_account.json"
 
 [scripts]
