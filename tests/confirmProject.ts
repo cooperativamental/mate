@@ -73,9 +73,45 @@ describe("An user can confirm his prticipation in a project", () => {
     [Buffer.from("project"), Buffer.from(name), Buffer.from(group)],
     program.programId,
   )
+  
+  const [groupPublicKey] = web3.PublicKey.findProgramAddressSync(
+    [Buffer.from("group"), Buffer.from(name)],
+    program.programId,
+  )
+
+  it("Create a group", async () => {
+    await program.methods
+      .createGroup(
+        name,
+        10,
+        [
+          member0.publicKey,
+          member1,
+          member2,
+          member3,
+          member4,
+          member5,
+          member6,
+          member7,
+          member8,
+          member9,
+        ]
+        )
+      .accounts({
+        group: groupPublicKey,
+        payer: anchorProvider.wallet.publicKey,
+        systemProgram: web3.SystemProgram.programId,
+      })
+      .rpc()
+  
+    const storedGroup = await program.account.group.fetch(groupPublicKey)
+    console.log(storedGroup)
+    assert.equal(storedGroup.name, name)
+
+  });
+
 
   it(" create a project", async () => {
-
     await program.methods
       .createProject(
         name,

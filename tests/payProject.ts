@@ -9,7 +9,7 @@ anchor.setProvider(anchorProvider);
 const program = anchor.workspace.Mate as Program<Mate>;
 
 const payer = (program.provider as anchor.AnchorProvider).wallet;
-const name = "I Will Pay This"
+const name = "I Will Pay For This"
 const group =  ""
 
 const currency = "SOL"

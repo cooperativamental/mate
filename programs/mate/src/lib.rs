@@ -66,6 +66,11 @@ pub mod mate {
 
     pub fn pay_project(ctx: Context<PayProject>) -> Result<()> {
         let project = &ctx.accounts.project;
+
+        if project.status == "REJECTED" {
+            return Err(error!(ErrorCode::InvalidActionForProjectCurrentStatus))
+        }
+
         let group = &ctx.accounts.group;
         let members = [
             &mut ctx.accounts.member_0,
@@ -148,6 +153,11 @@ pub mod mate {
 
     pub fn use_project_treasury(ctx: Context<UseProjectTreasury>, amount: u64) -> Result<()> {
         let project = &mut ctx.accounts.project;
+
+        if project.status != "STARTED" {
+            return Err(error!(ErrorCode::InvalidActionForProjectCurrentStatus))
+        }
+
         **project.to_account_info().try_borrow_mut_lamports()? -= amount;
         **ctx.accounts.receiver.try_borrow_mut_lamports()? += amount;
 
@@ -163,6 +173,10 @@ pub mod mate {
     pub fn confirm_project_participation(ctx: Context<ConfirmProjectParticipation>) -> Result<()> {
         let project = &mut ctx.accounts.project;
         let user = &mut ctx.accounts.user;
+
+        if project.status != "STARTED" {
+            return Err(error!(ErrorCode::InvalidActionForProjectCurrentStatus))
+        }
         let members_status = project
             .members
             .iter()
@@ -188,6 +202,76 @@ pub mod mate {
 
         Ok(())
     }
+
+    pub fn reject_project_participation(ctx: Context<ConfirmProjectParticipation>) -> Result<()> {
+        let project = &mut ctx.accounts.project;
+        let user = &mut ctx.accounts.user;
+
+        if project.status != "STARTED" {
+            return Err(error!(ErrorCode::InvalidActionForProjectCurrentStatus))
+        }
+        let members_status = project
+            .members
+            .iter()
+            .map(|member| Member {
+                pubkey: member.pubkey,
+                amount: member.amount,
+                status: if member.pubkey == user.to_account_info().key() {
+                    "REJECTED".to_string()
+                } else {
+                    (*member.status).to_string()
+                },
+            })
+            .collect();
+        project.members = members_status;
+
+        if project
+            .members
+            .iter()
+            .any(|member| member.status == "REJECTED")
+        {
+            project.status = "REJECTED".to_string()
+        }
+
+        Ok(())
+    }
+
+    
+    pub fn update_project(
+        ctx: Context<CreateProject>,
+        ratio: u16,
+        payments: Vec<Payment>,
+        currency: String,
+        amount: u64,
+        start_date: u64,
+        end_date: u64,
+        client: Pubkey,
+    ) -> Result<()> {
+        let project = &mut ctx.accounts.project;
+        
+        if project.status != "REJECTED" {
+            return Err(error!(ErrorCode::OnlyCanUpdateRejectedProjects))
+        }
+
+        project.ratio = ratio;
+        project.members = payments
+            .iter()
+            .map(|payment| Member {
+                pubkey: payment.member,
+                amount: payment.amount,
+                status: "INVITED".to_string(),
+            })
+            .collect();
+        project.currency = currency;
+        project.status = "STARTED".to_string();
+        project.amount = amount;
+        project.start_date = start_date;
+        project.end_date = end_date;
+        project.client = client;
+
+        Ok(())
+    }
+
 }
 
 #[derive(Accounts)]
@@ -290,6 +374,20 @@ pub struct ConfirmProjectParticipation<'info> {
     pub system_program: Program<'info, System>,
 }
 
+
+#[derive(Accounts)]
+#[instruction(name: String, group: String)]
+pub struct UpdateProject<'info> {
+    #[account(
+        mut
+    )]
+    pub project: Account<'info, Project>,
+    /// CHECK:
+    #[account(mut)]
+    pub payer: AccountInfo<'info>,
+    pub system_program: Program<'info, System>,
+}
+
 #[account]
 pub struct Group {
     pub name: String,
@@ -338,4 +436,8 @@ pub struct GroupChanged {
 pub enum ErrorCode {
     #[msg("User isn't a member of this project")]
     NotMember,
+    #[msg("Cannot perform the requested instruction because the current project status")]
+    InvalidActionForProjectCurrentStatus,
+    #[msg("Only rejected projects can be updated")]
+    OnlyCanUpdateRejectedProjects,
 }
