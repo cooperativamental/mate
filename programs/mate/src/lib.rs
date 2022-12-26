@@ -5,7 +5,7 @@ use anchor_lang::{
     solana_program::{program::invoke, system_instruction},
 };
 
-declare_id!("BRjfcsCNNaEx5WoY8hsSregr1pnGqFJtbCNcbvJM3ysc");
+declare_id!("95x4sztEpVWfhSJZJQdsb6Hy9D5NKVGQYmTEBs5b3j4W");
 
 #[program]
 pub mod mate {
@@ -19,7 +19,7 @@ pub mod mate {
     ) -> Result<()> {
         let group = &mut ctx.accounts.group;
         group.name = (*name).to_string();
-        group.ratio = ratio;
+        group.ratio = if name == "" {0} else {ratio};
         group.members = members;
         group.bump = *ctx.bumps.get("group").unwrap();
 
@@ -43,8 +43,8 @@ pub mod mate {
     ) -> Result<()> {
         let project = &mut ctx.accounts.project;
         project.name = (*name).to_string();
-        project.group = group;
-        project.project_type = project_type;
+        project.group = (*group).to_string();
+        project.project_type = if group == "" {"TEAMLESS".to_string()} else{project_type};
         project.ratio = ratio;
         project.members = payments
             .iter()
@@ -110,7 +110,7 @@ pub mod mate {
                 None => Ok(()),
             };
         });
-        if group.ratio > 0 {
+        if group.ratio > 0 && group.name != "" && project.project_type != "TEAMLESS"{
             let amount_to_group = project.amount * ctx.accounts.group.ratio as u64 / 10000;
             msg!("Paying {:#?} Lamports to Group treasury", amount_to_group);
             invoke(
@@ -154,7 +154,7 @@ pub mod mate {
     pub fn use_project_treasury(ctx: Context<UseProjectTreasury>, amount: u64) -> Result<()> {
         let project = &mut ctx.accounts.project;
 
-        if project.status != "STARTED" {
+        if project.status != "PAID" {
             return Err(error!(ErrorCode::InvalidActionForProjectCurrentStatus))
         }
 
@@ -235,7 +235,6 @@ pub mod mate {
 
         Ok(())
     }
-
     
     pub fn update_project(
         ctx: Context<CreateProject>,
@@ -373,7 +372,6 @@ pub struct ConfirmProjectParticipation<'info> {
     pub user: AccountInfo<'info>,
     pub system_program: Program<'info, System>,
 }
-
 
 #[derive(Accounts)]
 #[instruction(name: String, group: String)]
