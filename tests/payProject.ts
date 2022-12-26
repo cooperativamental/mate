@@ -11,11 +11,11 @@ const program = anchor.workspace.Mate as Program<Mate>;
 const payer = (program.provider as anchor.AnchorProvider).wallet;
 const name = "I Will Pay For This"
 const group =  ""
-
+const common_expenses = new anchor.BN(2)
 const currency = "SOL"
 const amount = new anchor.BN(1 * web3.LAMPORTS_PER_SOL)
 const client = new PublicKey('Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS')
-
+const milesotnes = 0;
 const project_type = "project_type"
 const ratio = 10
 
@@ -82,8 +82,10 @@ describe("We Create a Project and then pay for it", () => {
         project_type,
         ratio,
         payments,
+        common_expenses,
         currency,
         amount,
+        milesotnes,
         new anchor.BN(Date.now()),
         new anchor.BN(Date.now()),
         client

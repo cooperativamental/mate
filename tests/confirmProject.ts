@@ -15,6 +15,8 @@ describe("An user can confirm his prticipation in a project", () => {
   const ratio = 10
   const currency = "SOL"
   const amount = new anchor.BN(20)
+  const common_expenses = new anchor.BN(2)
+  const milestones = 0;
   const client = new PublicKey('5xot9PVkphiX2adznghwrAuxGs2zeWisNSxMW6hU6Hkj')
   const member0 = (program.provider as anchor.AnchorProvider).wallet;
   const member1 = new PublicKey("EjPpXXDykPawauyZHsBMtxGwG7K4iFmxdvB6ockM56ZN")
@@ -119,8 +121,10 @@ describe("An user can confirm his prticipation in a project", () => {
         project_type,
         ratio,
         payments,
+        common_expenses,
         currency,
         amount,
+        milestones,
         new anchor.BN(Date.now()),
         new anchor.BN(Date.now()),
         client
