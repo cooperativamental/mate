@@ -5,7 +5,7 @@ use anchor_lang::{
     solana_program::{program::invoke, system_instruction},
 };
 
-declare_id!("95x4sztEpVWfhSJZJQdsb6Hy9D5NKVGQYmTEBs5b3j4W");
+declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
 
 #[program]
 pub mod mate {
@@ -252,7 +252,7 @@ pub mod mate {
         {
             let status = "SIGNED".to_string();
             project.status = (*status).to_string();
-            
+
             emit!(ProyectSigned {
                 name: (*project.name).to_string(),
                 group: (*project.group).to_string(),
@@ -329,13 +329,13 @@ pub mod mate {
             return Err(error!(ErrorCode::OnlyCanUpdateRejectedProjects));
         }
         let members: Vec<Member> = payments
-        .iter()
-        .map(|payment| Member {
-            pubkey: payment.member,
-            amount: payment.amount,
-            status: "INVITED".to_string(),
-        })
-        .collect();
+            .iter()
+            .map(|payment| Member {
+                pubkey: payment.member,
+                amount: payment.amount,
+                status: "INVITED".to_string(),
+            })
+            .collect();
 
         project.ratio = ratio;
         project.members = (*members).to_vec();
@@ -353,7 +353,7 @@ pub mod mate {
             ratio,
             members,
             currency: (*currency).to_string(),
-            status:"STARTED".to_string(),
+            status: "STARTED".to_string(),
             amount,
             common_expenses,
             start_date,
