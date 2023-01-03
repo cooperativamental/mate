@@ -5,7 +5,7 @@ use anchor_lang::{
     solana_program::{program::invoke, system_instruction},
 };
 
-declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
+declare_id!("9TLKEXcZuhJgQqjLwnEpEhnEnVH7wVd4hHvn2kFWRfiS");
 
 #[program]
 pub mod mate {
@@ -53,7 +53,7 @@ pub mod mate {
             .map(|payment| Member {
                 pubkey: payment.member,
                 amount: payment.amount,
-                status: "INVITED".to_string(),
+                status: if payment.member == ctx.accounts.payer.key() { "CONFIRMED".to_string() }else{ "INVITED".to_string()},
             })
             .collect();
         let status = "STARTED".to_string();
