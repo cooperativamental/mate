@@ -39,7 +39,6 @@ For the Front End project go to: [https://github.com/cooperativamental/MATE-app]
 
 ### Aditional documentation
 
-**Online:** [https://mateprotocol.co/doc/solana-program/mate/index.html](https://mateprotocol.co/doc/solana-program/mate/index.html)
-**OffLine:**
+
 Running `cargo doc` in a terminal will outputs a folder named `target/doc` wich contains very detailed documentation of the project and his depencies,
 We recommend `/target/doc/mate/index.html` as an entrypoint.
