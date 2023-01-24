@@ -1,7 +1,7 @@
 # Mate Protocol
 
 This is the Repo for the Solana Program (aka Smart Contract)
-For the Front End project go to: [https://github.com/cooperativamental/MATE-app](https://github.com/cooperativamental/MATE-app)
+For the Front End project go to: [https://github.com/cooperativamental/MateApp](https://github.com/cooperativamental/MateApp)
 
 ### Steps to run this project
 
