@@ -5,7 +5,7 @@ use anchor_lang::{
     solana_program::{program::invoke, system_instruction},
 };
 
-declare_id!("9TLKEXcZuhJgQqjLwnEpEhnEnVH7wVd4hHvn2kFWRfiS");
+declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
 
 #[program]
 pub mod mate {
@@ -53,7 +53,11 @@ pub mod mate {
             .map(|payment| Member {
                 pubkey: payment.member,
                 amount: payment.amount,
-                status: if payment.member == ctx.accounts.payer.key() { "CONFIRMED".to_string() }else{ "INVITED".to_string()},
+                status: if payment.member == ctx.accounts.payer.key() {
+                    "CONFIRMED".to_string()
+                } else {
+                    "INVITED".to_string()
+                },
             })
             .collect();
         let status = "STARTED".to_string();
@@ -124,21 +128,25 @@ pub mod mate {
             match found {
                 Some(member) => {
                     msg!(
-                        "Paying {:#?} Lamports to {:#?}",
+                        "Paying {:#?} {:#?} to {:#?}",
                         payment.amount,
+                        project.currency,
                         payment.pubkey
                     );
-                    invoke(
-                        &system_instruction::transfer(
-                            ctx.accounts.payer.key,
-                            &payment.pubkey,
-                            payment.amount,
-                        ),
-                        &[
-                            ctx.accounts.payer.to_account_info().clone(),
-                            member.to_account_info().clone(),
-                        ],
-                    );
+                    if project.currency == "SOL" {
+                        invoke(
+                            &system_instruction::transfer(
+                                ctx.accounts.payer.key,
+                                &payment.pubkey,
+                                payment.amount,
+                            ),
+                            &[
+                                ctx.accounts.payer.to_account_info().clone(),
+                                member.to_account_info().clone(),
+                            ],
+                        )
+                        .unwrap();
+                    }
                     payed_amount = payed_amount.unwrap().checked_add(payment.amount);
                 }
                 None => (),
@@ -146,38 +154,47 @@ pub mod mate {
         });
         if group.ratio > 0 && group.name != "" && project.project_type != "TEAMLESS" {
             let amount_to_group = project.amount * ctx.accounts.group.ratio as u64 / 10000;
-            msg!("Paying {:#?} Lamports to Group treasury", amount_to_group);
-            invoke(
-                &system_instruction::transfer(
-                    ctx.accounts.payer.key,
-                    &ctx.accounts.group.key(),
-                    amount_to_group,
-                ),
-                &[
-                    ctx.accounts.payer.to_account_info().clone(),
-                    ctx.accounts.group.to_account_info().clone(),
-                ],
-            )?;
+            msg!(
+                "Paying {:#?} {:#?} to Group treasury",
+                amount_to_group,
+                project.currency,
+            );
+            if project.currency == "SOL" {
+                invoke(
+                    &system_instruction::transfer(
+                        ctx.accounts.payer.key,
+                        &ctx.accounts.group.key(),
+                        amount_to_group,
+                    ),
+                    &[
+                        ctx.accounts.payer.to_account_info().clone(),
+                        ctx.accounts.group.to_account_info().clone(),
+                    ],
+                )?;
+            }
             payed_amount = payed_amount.unwrap().checked_add(amount_to_group);
         }
 
         if project.amount > payed_amount.unwrap() {
             let amount_to_project = project.amount - payed_amount.unwrap();
             msg!(
-                "Paying {:#?} Lamports to project treasury",
-                amount_to_project
+                "Paying {:#?} {:#?} to project treasury",
+                amount_to_project,
+                project.currency,
             );
-            invoke(
-                &system_instruction::transfer(
-                    ctx.accounts.payer.key,
-                    &ctx.accounts.project.key(),
-                    amount_to_project,
-                ),
-                &[
-                    ctx.accounts.payer.to_account_info().clone(),
-                    ctx.accounts.project.to_account_info().clone(),
-                ],
-            )?;
+            if project.currency == "SOL" {
+                invoke(
+                    &system_instruction::transfer(
+                        ctx.accounts.payer.key,
+                        &ctx.accounts.project.key(),
+                        amount_to_project,
+                    ),
+                    &[
+                        ctx.accounts.payer.to_account_info().clone(),
+                        ctx.accounts.project.to_account_info().clone(),
+                    ],
+                )?;
+            }
         }
         let project = &mut ctx.accounts.project;
         project.status = "PAID".to_string();
@@ -198,10 +215,10 @@ pub mod mate {
         if project.status != "PAID" {
             return Err(error!(ErrorCode::InvalidActionForProjectCurrentStatus));
         }
-
-        **project.to_account_info().try_borrow_mut_lamports()? -= amount;
-        **ctx.accounts.receiver.try_borrow_mut_lamports()? += amount;
-
+        if project.currency == "SOL" {
+            **project.to_account_info().try_borrow_mut_lamports()? -= amount;
+            **ctx.accounts.receiver.try_borrow_mut_lamports()? += amount;
+        }
         emit!(ProyectTreasuryUsed {
             name: (*project.name).to_string(),
             amount,
